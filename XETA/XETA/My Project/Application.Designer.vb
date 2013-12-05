@@ -32,7 +32,7 @@ Namespace My
         
         <Global.System.Diagnostics.DebuggerStepThroughAttribute()>  _
         Protected Overrides Sub OnCreateMainForm()
-            Me.MainForm = Global.XETA.Form1
+            Me.MainForm = Global.XETA.mainGUI
         End Sub
     End Class
 End Namespace
