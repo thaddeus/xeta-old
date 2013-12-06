@@ -35,7 +35,7 @@ namespace XETA
             else
             {
                 //We should probably be connecting
-                xSocket = new xetaSocket(txtIP.Text, txtPort.Text);
+                xSocket = new xetaSocket(txtIP.Text, txtPort.Text, this);
 
                 //Various UI feedback
                 btnConnect.Enabled = false;
