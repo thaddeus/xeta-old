@@ -16,7 +16,7 @@ namespace XETA
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new mainGUI());
+           Application.Run(new mainGUI());
         }
     }
 }
