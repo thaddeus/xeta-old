@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="deviceManager.cs" />
     <Compile Include="mainGUI.cs">
       <SubType>Form</SubType>
     </Compile>

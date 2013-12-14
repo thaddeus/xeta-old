@@ -17,6 +17,8 @@ namespace XETA
         public mainGUI()
         {
             InitializeComponent();
+            deviceManager.onkyoController.ip = txtOnkyoIP.Text;
+            deviceManager.onkyoController.port = txtOnkyoPort.Text;
         }
 
         private void btnConnect_Click(object sender, EventArgs e)
@@ -63,6 +65,21 @@ namespace XETA
                 btnConnect.Text = "Disconnect";
                 btnConnect.Enabled = true;
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            deviceManager.onkyoController.askQuestion("PWRQSTN");
+        }
+
+        private void txtOnkyoIP_TextChanged(object sender, EventArgs e)
+        {
+            deviceManager.onkyoController.ip = txtOnkyoIP.Text;
+        }
+
+        private void txtOnkyoPort_TextChanged(object sender, EventArgs e)
+        {
+            deviceManager.onkyoController.port = txtOnkyoPort.Text;
         }
     }
 }
