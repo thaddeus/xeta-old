@@ -13,12 +13,15 @@ namespace XETA
     public partial class mainGUI : Form
     {
         private xetaSocket xSocket;
+        public audioInterface audio;
 
         public mainGUI()
         {
             InitializeComponent();
+            audio = new audioInterface();
             deviceManager.onkyoController.ip = txtOnkyoIP.Text;
             deviceManager.onkyoController.port = txtOnkyoPort.Text;
+            //tbarOnkyoVolume.Value = deviceManager.onkyoController.askQuestion("MVLQSTN").Substring(5).ConvertHexValueToInt();
         }
 
         private void btnConnect_Click(object sender, EventArgs e)
@@ -50,24 +53,34 @@ namespace XETA
 
         private void clientTick_Tick(object sender, EventArgs e)
         {
-            if (btnConnect.Text == "Connecting..." && xSocket != null && xSocket.getClientState() == System.Net.WebSockets.WebSocketState.Closed)
+            if (xSocket != null && (xSocket.getClientState() == System.Net.WebSockets.WebSocketState.Closed || xSocket.getClientState() == System.Net.WebSockets.WebSocketState.Aborted))
             {
                 //Failed?
                 Console.WriteLine("XETAServer connection failed or closed.");
+                //Try reconnecting
+                xSocket.connect();
                 //Renable stuff!
                 btnConnect.Enabled = true;
                 btnConnect.Text = "Connect";
                 txtIP.Enabled = true;
                 txtPort.Enabled = true;
             }
-            else if (btnConnect.Enabled == false && xSocket != null && xSocket.getClientState() == System.Net.WebSockets.WebSocketState.Open)
+            else if (xSocket != null && xSocket.getClientState() == System.Net.WebSockets.WebSocketState.Open)
             {
                 btnConnect.Text = "Disconnect";
                 btnConnect.Enabled = true;
             }
+
+            if(xSocket != null && xSocket.getClientState() == System.Net.WebSockets.WebSocketState.Open)
+            {
+                xSocket.Send(Packets.outgoing.getPacket(new Packets.outgoing.IdlePacket()));
+                Console.WriteLine("Sent idle packet");
+            }
+            lblInputOutput.Text = Input.SecondsSinceLastInput().ToString();
+            
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void btnOnkyoStandard_Click(object sender, EventArgs e)
         {
             deviceManager.onkyoController.askQuestion("PWRQSTN");
         }
@@ -80,6 +93,36 @@ namespace XETA
         private void txtOnkyoPort_TextChanged(object sender, EventArgs e)
         {
             deviceManager.onkyoController.port = txtOnkyoPort.Text;
+        }
+
+        private void btnOnkyoMusic_Click(object sender, EventArgs e)
+        {
+            deviceManager.onkyoController.setMusicMode();
+        }
+
+        private void btnOnkyoMovie_Click(object sender, EventArgs e)
+        {
+            deviceManager.onkyoController.setMovieMode();
+        }
+
+        private void btnOnkyoGame_Click(object sender, EventArgs e)
+        {
+            deviceManager.onkyoController.setGameMode();
+        }
+
+        private void tbarOnkyoVolume_ValueChanged(object sender, EventArgs e)
+        {
+            deviceManager.onkyoController.sendMessage("MVL" + tbarOnkyoVolume.Value.ConverIntValueToHexString());
+        }
+
+        private void audioTick_Tick(object sender, EventArgs e)
+        {
+            if (xSocket != null && xSocket.getClientState() == System.Net.WebSockets.WebSocketState.Open)
+            {
+                xSocket.Send(Packets.outgoing.getPacket(new Packets.outgoing.AudioLevelPacket(audio.getMasterPeak(), audio.getLeftPeak(), audio.getRightPeak())));
+                Console.WriteLine("Sent audio packet");
+            }
+            lblPeakOutput.Text = audio.getMasterPeak().ToString();
         }
     }
 }

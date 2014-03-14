@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CoreAudioApi">
+      <HintPath>..\..\CoreAudioApi\bin\Debug\CoreAudioApi.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json.Net20">
       <HintPath>.\Newtonsoft.Json.Net20.dll</HintPath>
     </Reference>
@@ -47,7 +50,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="audioInterface.cs" />
+    <Compile Include="boblight-client.cs" />
     <Compile Include="deviceManager.cs" />
+    <Compile Include="Input.cs" />
     <Compile Include="mainGUI.cs">
       <SubType>Form</SubType>
     </Compile>

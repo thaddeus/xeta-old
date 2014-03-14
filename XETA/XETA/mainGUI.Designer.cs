@@ -38,14 +38,25 @@
             this.lblConnectionPanel = new System.Windows.Forms.Label();
             this.clientTick = new System.Windows.Forms.Timer(this.components);
             this.panelOnkyo = new System.Windows.Forms.Panel();
+            this.tbarOnkyoVolume = new System.Windows.Forms.TrackBar();
+            this.btnOnkyoGame = new System.Windows.Forms.Button();
+            this.btnOnkyoMusic = new System.Windows.Forms.Button();
+            this.btnOnkyoMovie = new System.Windows.Forms.Button();
             this.lblOnkyoPort = new System.Windows.Forms.Label();
             this.txtOnkyoPort = new System.Windows.Forms.TextBox();
             this.lblOnkyoIP = new System.Windows.Forms.Label();
             this.txtOnkyoIP = new System.Windows.Forms.TextBox();
             this.lblOnkyoPanel = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.lblSSI = new System.Windows.Forms.Label();
+            this.lblInputOutput = new System.Windows.Forms.Label();
+            this.lblPeakOutput = new System.Windows.Forms.Label();
+            this.lblpeak = new System.Windows.Forms.Label();
+            this.audioTick = new System.Windows.Forms.Timer(this.components);
             this.panelNetwork.SuspendLayout();
             this.panelOnkyo.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tbarOnkyoVolume)).BeginInit();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // panelNetwork
@@ -87,7 +98,7 @@
             this.txtPort.Name = "txtPort";
             this.txtPort.Size = new System.Drawing.Size(203, 20);
             this.txtPort.TabIndex = 3;
-            this.txtPort.Text = "47895";
+            this.txtPort.Text = "41414";
             // 
             // lblNetworkAddress
             // 
@@ -104,7 +115,7 @@
             this.txtIP.Name = "txtIP";
             this.txtIP.Size = new System.Drawing.Size(203, 20);
             this.txtIP.TabIndex = 1;
-            this.txtIP.Text = "x2.ixeta.net";
+            this.txtIP.Text = "x1.ixeta.net";
             // 
             // lblConnectionPanel
             // 
@@ -119,11 +130,16 @@
             // clientTick
             // 
             this.clientTick.Enabled = true;
+            this.clientTick.Interval = 750;
             this.clientTick.Tick += new System.EventHandler(this.clientTick_Tick);
             // 
             // panelOnkyo
             // 
             this.panelOnkyo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelOnkyo.Controls.Add(this.tbarOnkyoVolume);
+            this.panelOnkyo.Controls.Add(this.btnOnkyoGame);
+            this.panelOnkyo.Controls.Add(this.btnOnkyoMusic);
+            this.panelOnkyo.Controls.Add(this.btnOnkyoMovie);
             this.panelOnkyo.Controls.Add(this.lblOnkyoPort);
             this.panelOnkyo.Controls.Add(this.txtOnkyoPort);
             this.panelOnkyo.Controls.Add(this.lblOnkyoIP);
@@ -131,8 +147,48 @@
             this.panelOnkyo.Controls.Add(this.lblOnkyoPanel);
             this.panelOnkyo.Location = new System.Drawing.Point(235, 9);
             this.panelOnkyo.Name = "panelOnkyo";
-            this.panelOnkyo.Size = new System.Drawing.Size(219, 114);
+            this.panelOnkyo.Size = new System.Drawing.Size(219, 247);
             this.panelOnkyo.TabIndex = 1;
+            // 
+            // tbarOnkyoVolume
+            // 
+            this.tbarOnkyoVolume.Location = new System.Drawing.Point(8, 210);
+            this.tbarOnkyoVolume.Maximum = 100;
+            this.tbarOnkyoVolume.Name = "tbarOnkyoVolume";
+            this.tbarOnkyoVolume.Size = new System.Drawing.Size(203, 45);
+            this.tbarOnkyoVolume.TabIndex = 8;
+            this.tbarOnkyoVolume.TickFrequency = 5;
+            this.tbarOnkyoVolume.ValueChanged += new System.EventHandler(this.tbarOnkyoVolume_ValueChanged);
+            // 
+            // btnOnkyoGame
+            // 
+            this.btnOnkyoGame.Location = new System.Drawing.Point(8, 176);
+            this.btnOnkyoGame.Name = "btnOnkyoGame";
+            this.btnOnkyoGame.Size = new System.Drawing.Size(203, 28);
+            this.btnOnkyoGame.TabIndex = 7;
+            this.btnOnkyoGame.Text = "Game Setup";
+            this.btnOnkyoGame.UseVisualStyleBackColor = true;
+            this.btnOnkyoGame.Click += new System.EventHandler(this.btnOnkyoGame_Click);
+            // 
+            // btnOnkyoMusic
+            // 
+            this.btnOnkyoMusic.Location = new System.Drawing.Point(8, 142);
+            this.btnOnkyoMusic.Name = "btnOnkyoMusic";
+            this.btnOnkyoMusic.Size = new System.Drawing.Size(203, 28);
+            this.btnOnkyoMusic.TabIndex = 6;
+            this.btnOnkyoMusic.Text = "Music Setup";
+            this.btnOnkyoMusic.UseVisualStyleBackColor = true;
+            this.btnOnkyoMusic.Click += new System.EventHandler(this.btnOnkyoMusic_Click);
+            // 
+            // btnOnkyoMovie
+            // 
+            this.btnOnkyoMovie.Location = new System.Drawing.Point(8, 108);
+            this.btnOnkyoMovie.Name = "btnOnkyoMovie";
+            this.btnOnkyoMovie.Size = new System.Drawing.Size(203, 28);
+            this.btnOnkyoMovie.TabIndex = 5;
+            this.btnOnkyoMovie.Text = "Movie Setup";
+            this.btnOnkyoMovie.UseVisualStyleBackColor = true;
+            this.btnOnkyoMovie.Click += new System.EventHandler(this.btnOnkyoMovie_Click);
             // 
             // lblOnkyoPort
             // 
@@ -180,22 +236,68 @@
             this.lblOnkyoPanel.TabIndex = 0;
             this.lblOnkyoPanel.Text = "Onkyo Controller";
             // 
-            // button1
+            // panel1
             // 
-            this.button1.Location = new System.Drawing.Point(286, 129);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(143, 28);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel1.Controls.Add(this.lblPeakOutput);
+            this.panel1.Controls.Add(this.lblpeak);
+            this.panel1.Controls.Add(this.lblInputOutput);
+            this.panel1.Controls.Add(this.lblSSI);
+            this.panel1.Location = new System.Drawing.Point(10, 164);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(218, 92);
+            this.panel1.TabIndex = 2;
+            // 
+            // lblSSI
+            // 
+            this.lblSSI.AutoSize = true;
+            this.lblSSI.Location = new System.Drawing.Point(5, 4);
+            this.lblSSI.Name = "lblSSI";
+            this.lblSSI.Size = new System.Drawing.Size(109, 13);
+            this.lblSSI.TabIndex = 0;
+            this.lblSSI.Text = "Seconds Since Input:";
+            // 
+            // lblInputOutput
+            // 
+            this.lblInputOutput.AutoSize = true;
+            this.lblInputOutput.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblInputOutput.Location = new System.Drawing.Point(114, 4);
+            this.lblInputOutput.Name = "lblInputOutput";
+            this.lblInputOutput.Size = new System.Drawing.Size(13, 13);
+            this.lblInputOutput.TabIndex = 1;
+            this.lblInputOutput.Text = "0";
+            // 
+            // lblPeakOutput
+            // 
+            this.lblPeakOutput.AutoSize = true;
+            this.lblPeakOutput.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblPeakOutput.Location = new System.Drawing.Point(114, 21);
+            this.lblPeakOutput.Name = "lblPeakOutput";
+            this.lblPeakOutput.Size = new System.Drawing.Size(13, 13);
+            this.lblPeakOutput.TabIndex = 3;
+            this.lblPeakOutput.Text = "0";
+            // 
+            // lblpeak
+            // 
+            this.lblpeak.AutoSize = true;
+            this.lblpeak.Location = new System.Drawing.Point(49, 21);
+            this.lblpeak.Name = "lblpeak";
+            this.lblpeak.Size = new System.Drawing.Size(65, 13);
+            this.lblpeak.TabIndex = 2;
+            this.lblpeak.Text = "Audio Peak:";
+            // 
+            // audioTick
+            // 
+            this.audioTick.Enabled = true;
+            this.audioTick.Interval = 50;
+            this.audioTick.Tick += new System.EventHandler(this.audioTick_Tick);
             // 
             // mainGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(464, 170);
-            this.Controls.Add(this.button1);
+            this.ClientSize = new System.Drawing.Size(463, 294);
+            this.Controls.Add(this.panel1);
             this.Controls.Add(this.panelOnkyo);
             this.Controls.Add(this.panelNetwork);
             this.MaximizeBox = false;
@@ -205,6 +307,9 @@
             this.panelNetwork.PerformLayout();
             this.panelOnkyo.ResumeLayout(false);
             this.panelOnkyo.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tbarOnkyoVolume)).EndInit();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -225,7 +330,16 @@
         private System.Windows.Forms.Label lblOnkyoIP;
         private System.Windows.Forms.TextBox txtOnkyoIP;
         private System.Windows.Forms.Label lblOnkyoPanel;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnOnkyoGame;
+        private System.Windows.Forms.Button btnOnkyoMusic;
+        private System.Windows.Forms.Button btnOnkyoMovie;
+        private System.Windows.Forms.TrackBar tbarOnkyoVolume;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label lblInputOutput;
+        private System.Windows.Forms.Label lblSSI;
+        private System.Windows.Forms.Label lblPeakOutput;
+        private System.Windows.Forms.Label lblpeak;
+        private System.Windows.Forms.Timer audioTick;
     }
 }
 

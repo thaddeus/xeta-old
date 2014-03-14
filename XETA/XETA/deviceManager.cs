@@ -16,11 +16,53 @@ namespace XETA
             public static string ip;
             public static string port;
 
-            public static void sendMessage(string message)
+            public static void setMusicMode()
             {
-                IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(ip), Int32.Parse(port));
+                deviceManager.onkyoController.sendMessage("PWR01");
+                deviceManager.onkyoController.sendMessage("AMT00");
+                deviceManager.onkyoController.sendMessage("SWL-A");
+                deviceManager.onkyoController.sendMessage("CTL-5");
+                deviceManager.onkyoController.sendMessage("DIM00");
+                deviceManager.onkyoController.sendMessage("LMD8C");
+                deviceManager.onkyoController.sendMessage("RAS01");
+                deviceManager.onkyoController.sendMessage("ADY02");
+                deviceManager.onkyoController.sendMessage("ADQ00");
+                deviceManager.onkyoController.sendMessage("MOT01");
+                deviceManager.onkyoController.sendMessage("LMD8C");
+            }
+
+            public static void setMovieMode()
+            {
+                deviceManager.onkyoController.sendMessage("PWR01");
+                deviceManager.onkyoController.sendMessage("AMT00");
+                deviceManager.onkyoController.sendMessage("SWL-6");
+                deviceManager.onkyoController.sendMessage("CTL+2");
+                deviceManager.onkyoController.sendMessage("DIM02");
+                deviceManager.onkyoController.sendMessage("RAS01");
+                deviceManager.onkyoController.sendMessage("ADY02");
+                deviceManager.onkyoController.sendMessage("ADY02");
+                deviceManager.onkyoController.sendMessage("MOT00");
+                deviceManager.onkyoController.sendMessage("LMD85");
+            }
+
+            public static void setGameMode()
+            {
+                deviceManager.onkyoController.sendMessage("PWR01");
+                deviceManager.onkyoController.sendMessage("AMT00");
+                deviceManager.onkyoController.sendMessage("SWL-6");
+                deviceManager.onkyoController.sendMessage("CTL00");
+                deviceManager.onkyoController.sendMessage("DIM00");
+                deviceManager.onkyoController.sendMessage("RAS00");
+                deviceManager.onkyoController.sendMessage("ADY00");
+                deviceManager.onkyoController.sendMessage("ADQ00");
+                deviceManager.onkyoController.sendMessage("MOT00");
+                deviceManager.onkyoController.sendMessage("LMD01");
+            }
+
+            public static async Task sendMessage(string message)
+            {
                 TcpClient tcpClient = new TcpClient();
-                tcpClient.Connect(endPoint);
+                await tcpClient.ConnectAsync(IPAddress.Parse(ip), Int32.Parse(port));
                 tcpClient.Client.Send(message.ToISCPCommandMessage(true));
                 tcpClient.Close();
             }
@@ -32,6 +74,7 @@ namespace XETA
                 tcpClient.Connect(endPoint);
                 tcpClient.Client.Send(message.ToISCPCommandMessage(true));
                 string reMessage = null;
+                bool secondResponse = false;
                 byte[] loNotProcessingBytes = null;
                 byte[] loResultBuffer;
                 while (tcpClient.Client != null)
@@ -40,7 +83,7 @@ namespace XETA
                     {
                         if (tcpClient.Client.Available > 0)
                         {
-                            var loBuffer = new byte[1024];
+                            var loBuffer = new byte[2048];
                             tcpClient.Client.Receive(loBuffer, loBuffer.Length, SocketFlags.None);
 
                             if (loNotProcessingBytes != null && loNotProcessingBytes.Length > 0)
@@ -53,15 +96,25 @@ namespace XETA
                             {
                                 Console.WriteLine("Receive Message {0}", lsMessage);
                                 reMessage = lsMessage;
+                                if(secondResponse)
+                                {
+                                    return reMessage;
+                                }
+                                else
+                                {
+                                    secondResponse = true;
+                                }
+                                
                             }
-                        }
+                            
+                        }  
                     }
                     catch (Exception exp)
                     {
                         //We had a problem
                     }
                 }
-                return reMessage;
+                return null;
             }
         }
 

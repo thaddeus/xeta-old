@@ -17,6 +17,7 @@ namespace XETA
         private static UTF8Encoding encoding = new UTF8Encoding();
         public byte connectTick = 0;
         private mainGUI mainGUI;
+        private Uri socketUri;
 
         //Create a new socket client class
         public xetaSocket(string networkAddress, string networkPort, mainGUI gui) 
@@ -24,10 +25,21 @@ namespace XETA
             mainGUI = gui;
             //Init socket
             socketClient = new ClientWebSocket();
+            socketUri = new Uri("ws://" + networkAddress + ":" + networkPort + "/");
+            connect();
+        }
+
+        public void connect()
+        {
             //Create a token from a cancel source object
             connectCancelToken = connectCancel.Token;
             //Start the connection task
-            Task socketConnectTask = socketClient.ConnectAsync(new Uri("ws://" + networkAddress + ":" + networkPort + "/"), connectCancelToken);
+            if(socketClient.State == WebSocketState.Aborted)
+            {
+                socketClient = new ClientWebSocket();
+            }
+            Task socketConnectTask = socketClient.ConnectAsync(socketUri, connectCancelToken);
+            socketConnectTask.Wait();
             //Lets receive after we've finished connecting
             socketConnectTask.ContinueWith((t) => Receive());
         }
@@ -39,11 +51,11 @@ namespace XETA
         }
 
         //Asynchronous Send Task
-        public async Task Send(String packet)
+        public void Send(String packet)
         {
             Console.WriteLine("Sending packet: " + packet);
             byte[] buffer = encoding.GetBytes(packet);
-            await socketClient.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+            socketClient.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
         }
 
         //Looping receive for the socket. Cancels when websocket state is no longer open.
@@ -129,7 +141,7 @@ public class Packets
         {
             case 0:
                 Console.WriteLine("Recieved Initialize Packet");
-                socket.Send(outgoing.getPacket(new outgoing.InitializePacket())).Wait();
+                socket.Send(outgoing.getPacket(new outgoing.InitializePacket()));
                 break;
             default:
                 Console.WriteLine("Invalid Packet Recieved: " + packet);
@@ -160,8 +172,7 @@ public class Packets
             //Tell the world about me
             InitializePacket,
             IdlePacket,
-            VolumePacket,
-            VolumePeakPacket
+            AudioLevelPacket
         }
 
         //Tell the server who I am
@@ -171,6 +182,28 @@ public class Packets
             public string clientType = "Daemon";
             public string machineName = System.Environment.MachineName;
             public string machineType = "Windows";
+        }
+
+        public class AudioLevelPacket
+        {
+            public int packetType = (int)packetTypes.AudioLevelPacket;
+            public int masterPeak;
+            public int leftPeak;
+            public int rightPeak;
+            public string machineName = System.Environment.MachineName;
+            public AudioLevelPacket(int mPeak, int lPeak, int rPeak)
+            {
+                masterPeak = mPeak;
+                leftPeak = lPeak;
+                rightPeak = rPeak;
+            }
+        }
+
+        public class IdlePacket
+        {
+            public int packetType = (int)packetTypes.IdlePacket;
+            public double idleTime = XETA.Input.SecondsSinceLastInput();
+            public string machineName = System.Environment.MachineName;
         }
     }
 }
