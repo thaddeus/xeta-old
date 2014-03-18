@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Net.WebSockets;
 using System.Threading;
 using Newtonsoft.Json;
+using System.Threading.Tasks.Dataflow;
 
 namespace XETA
 {
@@ -18,13 +19,13 @@ namespace XETA
         public byte connectTick = 0;
         private mainGUI mainGUI;
         private Uri socketUri;
+        private BufferBlock<string> messageQueue = new BufferBlock<string>();
 
         //Create a new socket client class
         public xetaSocket(string networkAddress, string networkPort, mainGUI gui) 
         {
             mainGUI = gui;
             //Init socket
-            socketClient = new ClientWebSocket();
             socketUri = new Uri("ws://" + networkAddress + ":" + networkPort + "/");
             connect();
         }
@@ -34,14 +35,11 @@ namespace XETA
             //Create a token from a cancel source object
             connectCancelToken = connectCancel.Token;
             //Start the connection task
-            if(socketClient.State == WebSocketState.Aborted)
-            {
-                socketClient = new ClientWebSocket();
-            }
+            socketClient = new ClientWebSocket();
             Task socketConnectTask = socketClient.ConnectAsync(socketUri, connectCancelToken);
-            socketConnectTask.Wait();
-            //Lets receive after we've finished connecting
+            //Lets send/receive after we've finished connecting
             socketConnectTask.ContinueWith((t) => Receive());
+            socketConnectTask.ContinueWith((t) => Send());
         }
 
         //Cancel a socket connection attempt
@@ -51,11 +49,29 @@ namespace XETA
         }
 
         //Asynchronous Send Task
-        public void Send(String packet)
+        public async Task Send()
         {
-            Console.WriteLine("Sending packet: " + packet);
-            byte[] buffer = encoding.GetBytes(packet);
-            socketClient.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+            while(socketClient.State == WebSocketState.Open)
+            {
+                string packet = await messageQueue.ReceiveAsync();
+                if (socketClient.State == WebSocketState.Open)
+                {
+                    //Continue
+                    Console.WriteLine("Sending packet: " + packet);
+                    byte[] buffer = encoding.GetBytes(packet);
+                    await socketClient.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+                }
+                else
+                {
+                    //Send later
+                    messageQueue.Post(packet);
+                }
+            }
+        }
+
+        public void queueMessage(string packet)
+        {
+            messageQueue.Post(packet);
         }
 
         //Looping receive for the socket. Cancels when websocket state is no longer open.
@@ -141,7 +157,7 @@ public class Packets
         {
             case 0:
                 Console.WriteLine("Recieved Initialize Packet");
-                socket.Send(outgoing.getPacket(new outgoing.InitializePacket()));
+                socket.queueMessage(outgoing.getPacket(new outgoing.InitializePacket()));
                 break;
             default:
                 Console.WriteLine("Invalid Packet Recieved: " + packet);
@@ -172,7 +188,8 @@ public class Packets
             //Tell the world about me
             InitializePacket,
             IdlePacket,
-            AudioLevelPacket
+            AudioLevelPacket,
+            WindowChangePacket
         }
 
         //Tell the server who I am
@@ -203,6 +220,13 @@ public class Packets
         {
             public int packetType = (int)packetTypes.IdlePacket;
             public double idleTime = XETA.Input.SecondsSinceLastInput();
+            public string machineName = System.Environment.MachineName;
+        }
+
+        public class WindowChangePacket
+        {
+            public int packetType = (int)packetTypes.WindowChangePacket;
+            public string windowName = XETA.Input.GetActiveWindowTitle();
             public string machineName = System.Environment.MachineName;
         }
     }

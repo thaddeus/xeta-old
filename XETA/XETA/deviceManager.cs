@@ -67,54 +67,63 @@ namespace XETA
                 tcpClient.Close();
             }
 
-            public static string askQuestion(string message)
+            public static async Task<string> askQuestion(string message)
             {
                 IPEndPoint endPoint = new IPEndPoint(IPAddress.Parse(ip), Int32.Parse(port));
                 TcpClient tcpClient = new TcpClient();
-                tcpClient.Connect(endPoint);
-                tcpClient.Client.Send(message.ToISCPCommandMessage(true));
-                string reMessage = null;
-                bool secondResponse = false;
-                byte[] loNotProcessingBytes = null;
-                byte[] loResultBuffer;
-                while (tcpClient.Client != null)
+                try
                 {
-                    try
+                    tcpClient.Connect(endPoint);
+                    tcpClient.Client.Send(message.ToISCPCommandMessage(true));
+                    string reMessage = null;
+                    bool secondResponse = false;
+                    byte[] loNotProcessingBytes = null;
+                    byte[] loResultBuffer;
+                    while (tcpClient.Client != null)
                     {
-                        if (tcpClient.Client.Available > 0)
+                        try
                         {
-                            var loBuffer = new byte[2048];
-                            tcpClient.Client.Receive(loBuffer, loBuffer.Length, SocketFlags.None);
-
-                            if (loNotProcessingBytes != null && loNotProcessingBytes.Length > 0)
-                                loResultBuffer = loNotProcessingBytes.Concat(loBuffer).ToArray();
-                            else
-                                loResultBuffer = loBuffer;
-
-                            Console.WriteLine("Receive byte [] {0}{1}", Environment.NewLine, loResultBuffer.FormatToOutput());
-                            foreach (var lsMessage in loResultBuffer.ToISCPStatusMessage(out loNotProcessingBytes))
+                            if (tcpClient.Client.Available > 0)
                             {
-                                Console.WriteLine("Receive Message {0}", lsMessage);
-                                reMessage = lsMessage;
-                                if(secondResponse)
-                                {
-                                    return reMessage;
-                                }
+                                var loBuffer = new byte[2048];
+                                tcpClient.Client.Receive(loBuffer, loBuffer.Length, SocketFlags.None);
+
+                                if (loNotProcessingBytes != null && loNotProcessingBytes.Length > 0)
+                                    loResultBuffer = loNotProcessingBytes.Concat(loBuffer).ToArray();
                                 else
+                                    loResultBuffer = loBuffer;
+
+                                Console.WriteLine("Receive byte [] {0}{1}", Environment.NewLine, loResultBuffer.FormatToOutput());
+                                foreach (var lsMessage in loResultBuffer.ToISCPStatusMessage(out loNotProcessingBytes))
                                 {
-                                    secondResponse = true;
+                                    Console.WriteLine("Receive Message {0}", lsMessage);
+                                    reMessage = lsMessage;
+                                    if (secondResponse)
+                                    {
+                                        return reMessage;
+                                    }
+                                    else
+                                    {
+                                        secondResponse = true;
+                                    }
+
                                 }
-                                
+
                             }
-                            
-                        }  
+                        }
+                        catch (Exception exp)
+                        {
+                            //We had a problem
+                        }
                     }
-                    catch (Exception exp)
-                    {
-                        //We had a problem
-                    }
+                    return null;
                 }
-                return null;
+                catch (SocketException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    throw;
+                }
+                
             }
         }
 

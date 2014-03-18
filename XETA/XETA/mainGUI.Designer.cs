@@ -48,15 +48,18 @@
             this.txtOnkyoIP = new System.Windows.Forms.TextBox();
             this.lblOnkyoPanel = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.lblSSI = new System.Windows.Forms.Label();
-            this.lblInputOutput = new System.Windows.Forms.Label();
             this.lblPeakOutput = new System.Windows.Forms.Label();
             this.lblpeak = new System.Windows.Forms.Label();
+            this.lblInputOutput = new System.Windows.Forms.Label();
+            this.lblSSI = new System.Windows.Forms.Label();
             this.audioTick = new System.Windows.Forms.Timer(this.components);
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.onkyoStatus = new System.Windows.Forms.Label();
             this.panelNetwork.SuspendLayout();
             this.panelOnkyo.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tbarOnkyoVolume)).BeginInit();
             this.panel1.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // panelNetwork
@@ -130,12 +133,13 @@
             // clientTick
             // 
             this.clientTick.Enabled = true;
-            this.clientTick.Interval = 750;
+            this.clientTick.Interval = 800;
             this.clientTick.Tick += new System.EventHandler(this.clientTick_Tick);
             // 
             // panelOnkyo
             // 
             this.panelOnkyo.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelOnkyo.Controls.Add(this.panel2);
             this.panelOnkyo.Controls.Add(this.tbarOnkyoVolume);
             this.panelOnkyo.Controls.Add(this.btnOnkyoGame);
             this.panelOnkyo.Controls.Add(this.btnOnkyoMusic);
@@ -147,7 +151,7 @@
             this.panelOnkyo.Controls.Add(this.lblOnkyoPanel);
             this.panelOnkyo.Location = new System.Drawing.Point(235, 9);
             this.panelOnkyo.Name = "panelOnkyo";
-            this.panelOnkyo.Size = new System.Drawing.Size(219, 247);
+            this.panelOnkyo.Size = new System.Drawing.Size(219, 273);
             this.panelOnkyo.TabIndex = 1;
             // 
             // tbarOnkyoVolume
@@ -248,25 +252,6 @@
             this.panel1.Size = new System.Drawing.Size(218, 92);
             this.panel1.TabIndex = 2;
             // 
-            // lblSSI
-            // 
-            this.lblSSI.AutoSize = true;
-            this.lblSSI.Location = new System.Drawing.Point(5, 4);
-            this.lblSSI.Name = "lblSSI";
-            this.lblSSI.Size = new System.Drawing.Size(109, 13);
-            this.lblSSI.TabIndex = 0;
-            this.lblSSI.Text = "Seconds Since Input:";
-            // 
-            // lblInputOutput
-            // 
-            this.lblInputOutput.AutoSize = true;
-            this.lblInputOutput.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblInputOutput.Location = new System.Drawing.Point(114, 4);
-            this.lblInputOutput.Name = "lblInputOutput";
-            this.lblInputOutput.Size = new System.Drawing.Size(13, 13);
-            this.lblInputOutput.TabIndex = 1;
-            this.lblInputOutput.Text = "0";
-            // 
             // lblPeakOutput
             // 
             this.lblPeakOutput.AutoSize = true;
@@ -286,11 +271,46 @@
             this.lblpeak.TabIndex = 2;
             this.lblpeak.Text = "Audio Peak:";
             // 
+            // lblInputOutput
+            // 
+            this.lblInputOutput.AutoSize = true;
+            this.lblInputOutput.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Underline, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblInputOutput.Location = new System.Drawing.Point(114, 4);
+            this.lblInputOutput.Name = "lblInputOutput";
+            this.lblInputOutput.Size = new System.Drawing.Size(13, 13);
+            this.lblInputOutput.TabIndex = 1;
+            this.lblInputOutput.Text = "0";
+            // 
+            // lblSSI
+            // 
+            this.lblSSI.AutoSize = true;
+            this.lblSSI.Location = new System.Drawing.Point(5, 4);
+            this.lblSSI.Name = "lblSSI";
+            this.lblSSI.Size = new System.Drawing.Size(109, 13);
+            this.lblSSI.TabIndex = 0;
+            this.lblSSI.Text = "Seconds Since Input:";
+            // 
             // audioTick
             // 
             this.audioTick.Enabled = true;
             this.audioTick.Interval = 50;
             this.audioTick.Tick += new System.EventHandler(this.audioTick_Tick);
+            // 
+            // panel2
+            // 
+            this.panel2.Controls.Add(this.onkyoStatus);
+            this.panel2.Location = new System.Drawing.Point(8, 246);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(203, 22);
+            this.panel2.TabIndex = 9;
+            // 
+            // onkyoStatus
+            // 
+            this.onkyoStatus.AutoSize = true;
+            this.onkyoStatus.Location = new System.Drawing.Point(5, 5);
+            this.onkyoStatus.Name = "onkyoStatus";
+            this.onkyoStatus.Size = new System.Drawing.Size(0, 13);
+            this.onkyoStatus.TabIndex = 0;
             // 
             // mainGUI
             // 
@@ -310,6 +330,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.tbarOnkyoVolume)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -340,6 +362,8 @@
         private System.Windows.Forms.Label lblPeakOutput;
         private System.Windows.Forms.Label lblpeak;
         private System.Windows.Forms.Timer audioTick;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Label onkyoStatus;
     }
 }
 

@@ -14,6 +14,7 @@ namespace XETA
     {
         private xetaSocket xSocket;
         public audioInterface audio;
+        private string lastWindow;
 
         public mainGUI()
         {
@@ -21,7 +22,15 @@ namespace XETA
             audio = new audioInterface();
             deviceManager.onkyoController.ip = txtOnkyoIP.Text;
             deviceManager.onkyoController.port = txtOnkyoPort.Text;
-            //tbarOnkyoVolume.Value = deviceManager.onkyoController.askQuestion("MVLQSTN").Substring(5).ConvertHexValueToInt();
+            try
+            {
+                Task<string> mVolumeTask = Task.Run<string>(() => deviceManager.onkyoController.askQuestion("MVLQSTN"));
+                mVolumeTask.ContinueWith((volume) => { this.Invoke( new Action ( () => { tbarOnkyoVolume.Value = mVolumeTask.Result.Substring(5).ConvertHexValueToInt(); } ) ); } );
+            }
+            catch (Exception)
+            {
+                onkyoStatus.Text = "Error connecting to Onkyo";
+            }
         }
 
         private void btnConnect_Click(object sender, EventArgs e)
@@ -73,16 +82,17 @@ namespace XETA
 
             if(xSocket != null && xSocket.getClientState() == System.Net.WebSockets.WebSocketState.Open)
             {
-                xSocket.Send(Packets.outgoing.getPacket(new Packets.outgoing.IdlePacket()));
+                xSocket.queueMessage(Packets.outgoing.getPacket(new Packets.outgoing.IdlePacket()));
                 Console.WriteLine("Sent idle packet");
+                if(Input.GetActiveWindowTitle() != lastWindow)
+                {
+                    xSocket.queueMessage(Packets.outgoing.getPacket(new Packets.outgoing.WindowChangePacket()));
+                    Console.WriteLine("Sent window change packet");
+                }
             }
             lblInputOutput.Text = Input.SecondsSinceLastInput().ToString();
+            lastWindow = Input.GetActiveWindowTitle();
             
-        }
-
-        private void btnOnkyoStandard_Click(object sender, EventArgs e)
-        {
-            deviceManager.onkyoController.askQuestion("PWRQSTN");
         }
 
         private void txtOnkyoIP_TextChanged(object sender, EventArgs e)
@@ -119,7 +129,7 @@ namespace XETA
         {
             if (xSocket != null && xSocket.getClientState() == System.Net.WebSockets.WebSocketState.Open)
             {
-                xSocket.Send(Packets.outgoing.getPacket(new Packets.outgoing.AudioLevelPacket(audio.getMasterPeak(), audio.getLeftPeak(), audio.getRightPeak())));
+                xSocket.queueMessage(Packets.outgoing.getPacket(new Packets.outgoing.AudioLevelPacket(audio.getMasterPeak(), audio.getLeftPeak(), audio.getRightPeak())));
                 Console.WriteLine("Sent audio packet");
             }
             lblPeakOutput.Text = audio.getMasterPeak().ToString();
