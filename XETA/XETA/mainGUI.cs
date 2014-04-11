@@ -15,6 +15,7 @@ namespace XETA
         private xetaSocket xSocket;
         public audioInterface audio;
         private string lastWindow;
+        bobController ambiSocket = null;
 
         public mainGUI()
         {
@@ -22,15 +23,15 @@ namespace XETA
             audio = new audioInterface();
             deviceManager.onkyoController.ip = txtOnkyoIP.Text;
             deviceManager.onkyoController.port = txtOnkyoPort.Text;
-            try
-            {
-                Task<string> mVolumeTask = Task.Run<string>(() => deviceManager.onkyoController.askQuestion("MVLQSTN"));
-                mVolumeTask.ContinueWith((volume) => { this.Invoke( new Action ( () => { tbarOnkyoVolume.Value = mVolumeTask.Result.Substring(5).ConvertHexValueToInt(); } ) ); } );
-            }
-            catch (Exception)
-            {
-                onkyoStatus.Text = "Error connecting to Onkyo";
-            }
+            //try
+            //{
+            //    Task<string> mVolumeTask = Task.Run<string>(() => deviceManager.onkyoController.askQuestion("MVLQSTN"));
+            //    mVolumeTask.ContinueWith((volume) => { this.Invoke( new Action ( () => { tbarOnkyoVolume.Value = mVolumeTask.Result.Substring(5).ConvertHexValueToInt(); } ) ); } );
+            //}
+            //catch (Exception)
+            //{
+            //    onkyoStatus.Text = "Error connecting to Onkyo";
+            //}
         }
 
         private void btnConnect_Click(object sender, EventArgs e)
@@ -133,6 +134,34 @@ namespace XETA
                 Console.WriteLine("Sent audio packet");
             }
             lblPeakOutput.Text = audio.getMasterPeak().ToString();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (btnbobConnect.Text == "Stop Ambilight")
+            {
+                btnbobConnect.Text = "Start Ambilight";
+                ambiSocket.killClient();
+            }
+            else
+            {
+                ambiSocket = new bobController(txtbobIP.Text, Convert.ToInt32(txtbobPort.Text));
+                ambiSocket.startAmbilight();
+                bobLight[] lights = ambiSocket.getLights();
+                btnbobConnect.Text = "Stop Ambilight";
+            }
+        }
+
+        private void luminositySlider_ValueChanged(object sender, EventArgs e)
+        {
+            ambiSocket.luminosityModifier = (double)luminositySlider.Value / 10;
+            lblLuminosity.Text = "Luminosity: " + ((float)luminositySlider.Value / 10).ToString();
+        }
+
+        private void saturationSlider_ValueChanged(object sender, EventArgs e)
+        {
+            ambiSocket.saturationModifier = (double)saturationSlider.Value / 10;
+            lblSaturation.Text = "Saturation: " + ((float)saturationSlider.Value / 10).ToString();
         }
     }
 }
